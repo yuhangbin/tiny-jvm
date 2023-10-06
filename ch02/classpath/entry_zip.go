@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"errors"
 	"io"
-	"io/ioutil"
 	"path/filepath"
 )
 
