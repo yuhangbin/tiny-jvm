@@ -2,14 +2,14 @@ package rtda
 
 type Frame struct {
 	lower 			*Frame
-	localVars 		LocalVars
-	operandStack	*OperandStack
+	LocalVars 		LocalVars
+	OperandStack	*OperandStack
 }
 
-func newFrame(maxLocals, maxStack uint) *Frame {
+func NewFrame(maxLocals, maxStack uint) *Frame {
 	return &Frame{
-		localVars: newLocalVars(maxLocals),
-		operandStack: newOperandStack(maxStack),
+		LocalVars: newLocalVars(maxLocals),
+		OperandStack: newOperandStack(maxStack),
 	}	
 }
 
