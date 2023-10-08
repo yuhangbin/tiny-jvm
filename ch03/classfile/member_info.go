@@ -28,7 +28,7 @@ func readMember(reader *ClassReader, cp ConstantPool) *MemberInfo {
 }
 
 func (self *MemberInfo) AccessFlags() uint16 {
-	
+	return self.accessFlags
 }
 
 func (self *MemberInfo) Name() string {
