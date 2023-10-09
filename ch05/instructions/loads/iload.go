@@ -1,7 +1,7 @@
 package loads
 
 import (
-	"github.com/tiny/jvm/ch04/rtda"
+	"github.com/tiny/jvm/ch05/rtda"
 	"github.com/tiny/jvm/ch05/instructions/base"
 )
 
@@ -15,6 +15,10 @@ type ILOAD_3 struct { base.NoOperandsInstruction }
 func _iload(frame *rtda.Frame, index uint)  {
 	val := frame.LocalVars.GetInt(index)
 	frame.OperandStack.PushInt(val)
+}
+
+func (self *ILOAD) FetchOperands(reader *base.BytecodeReader)  {
+	self.Index = uint(reader.ReadUint8())
 }
 
 func (self *ILOAD) Execute(frame *rtda.Frame)  {
