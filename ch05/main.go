@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/tiny/jvm/ch04/classfile"
-	"github.com/tiny/jvm/ch04/classpath"
-	"github.com/tiny/jvm/ch04/rtda"
+	"github.com/tiny/jvm/ch05/classfile"
+	"github.com/tiny/jvm/ch05/classpath"
+	"github.com/tiny/jvm/ch05/rtda"
 )
 
 func main() {
