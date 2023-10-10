@@ -9,6 +9,18 @@ type CodeAttribute struct {
 	attributes		[]AttributeInfo
 }
 
+func (self *CodeAttribute) MaxLocals() uint16 {
+	return self.maxLocals
+}
+
+func (self *CodeAttribute) MaxStack() uint16 {
+	return self.maxStack
+}
+
+func (self *CodeAttribute) Code() []byte {
+	return self.code
+}
+
 type ExceptionTableEntry struct {
 	startPc			uint16
 	endPc			uint16
