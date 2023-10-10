@@ -1,8 +1,8 @@
 package constants
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 type ACONST_NULL struct{ base.NoOperandsInstruction }

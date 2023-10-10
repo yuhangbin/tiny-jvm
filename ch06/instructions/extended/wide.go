@@ -1,10 +1,10 @@
 package extended
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/instructions/loads"
-	"github.com/tiny/jvm/ch05/instructions/math"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/instructions/loads"
+	"github.com/tiny/jvm/ch06/instructions/math"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 // Extend local variable index by additional bytes
@@ -12,7 +12,7 @@ type WIDE struct {
 	modifiedInstruction base.Instruction
 }
 
-func (self *WIDE) FetchOperands(reader *base.BytecodeReader)  {
+func (self *WIDE) FetchOperands(reader *base.BytecodeReader) {
 	opcode := reader.ReadUint8()
 	switch opcode {
 	case 0x15:
@@ -38,6 +38,6 @@ func (self *WIDE) FetchOperands(reader *base.BytecodeReader)  {
 	}
 }
 
-func (self *WIDE) Execute(frame *rtda.Frame)  {
+func (self *WIDE) Execute(frame *rtda.Frame) {
 	self.modifiedInstruction.Execute(frame)
 }

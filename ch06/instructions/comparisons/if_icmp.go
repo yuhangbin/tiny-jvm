@@ -1,20 +1,20 @@
 package comparisons
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 // Branch if int comparison succeeds
 
-type IF_ICMPEQ struct { base.BranchInstruction }
-type IF_ICMPNE struct { base.BranchInstruction }
-type IF_ICMPLT struct { base.BranchInstruction }
-type IF_ICMPLE struct { base.BranchInstruction }
-type IF_ICMPGT struct { base.BranchInstruction }
-type IF_ICMPGE struct { base.BranchInstruction }
+type IF_ICMPEQ struct{ base.BranchInstruction }
+type IF_ICMPNE struct{ base.BranchInstruction }
+type IF_ICMPLT struct{ base.BranchInstruction }
+type IF_ICMPLE struct{ base.BranchInstruction }
+type IF_ICMPGT struct{ base.BranchInstruction }
+type IF_ICMPGE struct{ base.BranchInstruction }
 
-func (self *IF_ICMPNE) Execute(frame *rtda.Frame)  {
+func (self *IF_ICMPNE) Execute(frame *rtda.Frame) {
 	stack := frame.OperandStack
 	val2 := stack.PopInt()
 	val1 := stack.PopInt()

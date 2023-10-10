@@ -1,19 +1,19 @@
 package control
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 // Access jump table by index and jump
 type TABLE_SWITCH struct {
-	defaultOffset		int32
-	low 				int32
-	high 				int32
-	jumpOffsets			[]int32
+	defaultOffset int32
+	low           int32
+	high          int32
+	jumpOffsets   []int32
 }
 
-func (self *TABLE_SWITCH) FetchOperands(reader *base.BytecodeReader)  {
+func (self *TABLE_SWITCH) FetchOperands(reader *base.BytecodeReader) {
 	reader.SkipPadding()
 	self.defaultOffset = reader.ReadInt32()
 	self.low = reader.ReadInt32()
@@ -22,7 +22,7 @@ func (self *TABLE_SWITCH) FetchOperands(reader *base.BytecodeReader)  {
 	self.jumpOffsets = reader.ReadInt32s(jumpOffsetsCount)
 }
 
-func (self *TABLE_SWITCH) Execute(frame *rtda.Frame)  {
+func (self *TABLE_SWITCH) Execute(frame *rtda.Frame) {
 	index := frame.OperandStack.PopInt()
 	var offset int
 	if index >= self.low && index <= self.high {

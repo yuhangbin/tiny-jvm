@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tiny/jvm/ch05/classfile"
-	"github.com/tiny/jvm/ch05/classpath"
+	"github.com/tiny/jvm/ch06/classfile"
+	"github.com/tiny/jvm/ch06/classpath"
 )
 
 func main() {
@@ -46,7 +46,7 @@ func loadClass(className string, cp *classpath.Classpath) *classfile.ClassFile {
 func getMainMethod(cf *classfile.ClassFile) *classfile.MemberInfo {
 	for _, m := range cf.Methods() {
 		if m.Name() == "main" && m.Descriptor() == "([Ljava/lang/String;)V" {
-			return m			
+			return m
 		}
 	}
 	return nil

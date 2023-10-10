@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/tiny/jvm/ch05/classfile"
-	"github.com/tiny/jvm/ch05/instructions"
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/classfile"
+	"github.com/tiny/jvm/ch06/instructions"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
-func interpret(methodInfo *classfile.MemberInfo)  {
+func interpret(methodInfo *classfile.MemberInfo) {
 	codeAttr := methodInfo.CodeAttribute()
 	maxLocals := codeAttr.MaxLocals()
 	maxStack := codeAttr.MaxStack()
@@ -22,15 +22,15 @@ func interpret(methodInfo *classfile.MemberInfo)  {
 	loop(thread, bytecode)
 }
 
-func catchErr(frame *rtda.Frame)  {
-	if r := recover(); r!= nil {
+func catchErr(frame *rtda.Frame) {
+	if r := recover(); r != nil {
 		fmt.Printf("LocalVars:%v\n", frame.LocalVars)
 		fmt.Printf("OperandStack:%v\n", frame.OperandStack)
 		panic(r)
 	}
 }
 
-func loop(thread *rtda.Thread, bytecode []byte)  {
+func loop(thread *rtda.Thread, bytecode []byte) {
 	frame := thread.PopFrame()
 	reader := &base.BytecodeReader{}
 	for {
@@ -42,7 +42,7 @@ func loop(thread *rtda.Thread, bytecode []byte)  {
 		inst := instructions.NewInstruction(opcode)
 		inst.FetchOperands(reader)
 		frame.SetNextPC(reader.PC())
-		// execute 
+		// execute
 		fmt.Printf("pc: %2c inst: %T %v\n", pc, inst, inst)
 		inst.Execute(frame)
 	}

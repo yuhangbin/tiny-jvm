@@ -1,14 +1,14 @@
 package comparisons
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 // Compare long
-type LCMP struct { base.NoOperandsInstruction }
+type LCMP struct{ base.NoOperandsInstruction }
 
-func (self *LCMP) Execute(frame *rtda.Frame)  {
+func (self *LCMP) Execute(frame *rtda.Frame) {
 	stack := frame.OperandStack
 	v2 := stack.PopLong()
 	v1 := stack.PopLong()

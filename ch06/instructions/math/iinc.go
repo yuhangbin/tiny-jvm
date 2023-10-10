@@ -1,21 +1,21 @@
 package math
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 type IINC struct {
-	Index 		uint
-	Const 		int32
+	Index uint
+	Const int32
 }
 
-func (self *IINC) FetchOperands(reader *base.BytecodeReader)  {
+func (self *IINC) FetchOperands(reader *base.BytecodeReader) {
 	self.Index = uint(reader.ReadUint8())
 	self.Const = int32(reader.ReadInt8())
 }
 
-func (self *IINC) Execute(frame *rtda.Frame)  {
+func (self *IINC) Execute(frame *rtda.Frame) {
 	localVars := frame.LocalVars
 	val := localVars.GetInt(self.Index)
 	val += self.Const

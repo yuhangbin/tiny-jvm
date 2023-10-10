@@ -1,14 +1,14 @@
 package comparisons
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
-type FCMPG struct { base.NoOperandsInstruction }
-type FCMPL struct { base.NoOperandsInstruction }
+type FCMPG struct{ base.NoOperandsInstruction }
+type FCMPL struct{ base.NoOperandsInstruction }
 
-func _fcmp(frame *rtda.Frame, gFlag bool)  {
+func _fcmp(frame *rtda.Frame, gFlag bool) {
 	stack := frame.OperandStack
 	v2 := stack.PopFloat()
 	v1 := stack.PopFloat()
@@ -25,10 +25,10 @@ func _fcmp(frame *rtda.Frame, gFlag bool)  {
 	}
 }
 
-func (self *FCMPG) Execute(frame *rtda.Frame)  {
+func (self *FCMPG) Execute(frame *rtda.Frame) {
 	_fcmp(frame, true)
 }
 
-func (self *FCMPL) Execute(frame *rtda.Frame)  {
+func (self *FCMPL) Execute(frame *rtda.Frame) {
 	_fcmp(frame, false)
 }

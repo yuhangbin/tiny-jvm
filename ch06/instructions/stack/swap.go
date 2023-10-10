@@ -1,14 +1,14 @@
 package stack
 
 import (
-	"github.com/tiny/jvm/ch05/rtda"
-	"github.com/tiny/jvm/ch05/instructions/base"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 // Swap the top two operand stack values
-type SWAP struct { base.NoOperandsInstruction }
+type SWAP struct{ base.NoOperandsInstruction }
 
-func (self *SWAP) Execute(frame *rtda.Frame)  {
+func (self *SWAP) Execute(frame *rtda.Frame) {
 	stack := frame.OperandStack
 	slot1 := stack.PopSlot()
 	slot2 := stack.PopSlot()

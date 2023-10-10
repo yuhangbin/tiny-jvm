@@ -1,8 +1,8 @@
 package extended
 
 import (
-	"github.com/tiny/jvm/ch05/instructions/base"
-	"github.com/tiny/jvm/ch05/rtda"
+	"github.com/tiny/jvm/ch06/instructions/base"
+	"github.com/tiny/jvm/ch06/rtda"
 )
 
 // Branch always (wide index)
@@ -10,10 +10,10 @@ type GOTO_W struct {
 	offset int
 }
 
-func (self *GOTO_W) FetchOperands(reader *base.BytecodeReader)  {
+func (self *GOTO_W) FetchOperands(reader *base.BytecodeReader) {
 	self.offset = int(reader.ReadInt32())
 }
 
-func (self *GOTO_W) Execute(frame *rtda.Frame)  {
+func (self *GOTO_W) Execute(frame *rtda.Frame) {
 	base.Branch(frame, self.offset)
 }
