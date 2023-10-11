@@ -1,10 +1,10 @@
 package extended
 
 import (
-	"github.com/tiny/jvm/ch06/instructions/base"
-	"github.com/tiny/jvm/ch06/instructions/loads"
-	"github.com/tiny/jvm/ch06/instructions/math"
-	"github.com/tiny/jvm/ch06/rtda"
+	"github.com/tiny/jvm/ch07/instructions/base"
+	"github.com/tiny/jvm/ch07/instructions/loads"
+	"github.com/tiny/jvm/ch07/instructions/math"
+	"github.com/tiny/jvm/ch07/rtda"
 )
 
 // Extend local variable index by additional bytes

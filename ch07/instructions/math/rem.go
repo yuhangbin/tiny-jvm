@@ -3,8 +3,8 @@ package math
 import (
 	"math"
 
-	"github.com/tiny/jvm/ch06/instructions/base"
-	"github.com/tiny/jvm/ch06/rtda"
+	"github.com/tiny/jvm/ch07/instructions/base"
+	"github.com/tiny/jvm/ch07/rtda"
 )
 
 type DREM struct{ base.NoOperandsInstruction }

@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/tiny/jvm/ch06/classfile"
-	"github.com/tiny/jvm/ch06/instructions"
-	"github.com/tiny/jvm/ch06/instructions/base"
-	"github.com/tiny/jvm/ch06/rtda"
+	"github.com/tiny/jvm/ch07/classfile"
+	"github.com/tiny/jvm/ch07/instructions"
+	"github.com/tiny/jvm/ch07/instructions/base"
+	"github.com/tiny/jvm/ch07/rtda"
 )
 
 func interpret(methodInfo *classfile.MemberInfo) {

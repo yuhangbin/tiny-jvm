@@ -3,8 +3,8 @@ package instructions
 import (
 	"fmt"
 
-	"github.com/tiny/jvm/ch06/instructions/base"
-	"github.com/tiny/jvm/ch06/instructions/constants"
+	"github.com/tiny/jvm/ch07/instructions/base"
+	"github.com/tiny/jvm/ch07/instructions/constants"
 )
 
 func NewInstruction(opcode byte) base.Instruction {

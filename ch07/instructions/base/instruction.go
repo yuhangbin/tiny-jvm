@@ -1,6 +1,6 @@
 package base
 
-import "github.com/tiny/jvm/ch06/rtda"
+import "github.com/tiny/jvm/ch07/rtda"
 
 type Instruction interface {
 	FetchOperands(reader *BytecodeReader)

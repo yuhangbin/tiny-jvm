@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tiny/jvm/ch06/classfile"
-	"github.com/tiny/jvm/ch06/classpath"
+	"github.com/tiny/jvm/ch07/classfile"
+	"github.com/tiny/jvm/ch07/classpath"
 )
 
 func main() {

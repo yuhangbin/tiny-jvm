@@ -1,8 +1,8 @@
 package stack
 
 import (
-	"github.com/tiny/jvm/ch06/instructions/base"
-	"github.com/tiny/jvm/ch06/rtda"
+	"github.com/tiny/jvm/ch07/instructions/base"
+	"github.com/tiny/jvm/ch07/rtda"
 )
 
 // Swap the top two operand stack values

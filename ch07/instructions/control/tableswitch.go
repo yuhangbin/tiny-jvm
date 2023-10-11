@@ -1,8 +1,8 @@
 package control
 
 import (
-	"github.com/tiny/jvm/ch06/instructions/base"
-	"github.com/tiny/jvm/ch06/rtda"
+	"github.com/tiny/jvm/ch07/instructions/base"
+	"github.com/tiny/jvm/ch07/rtda"
 )
 
 // Access jump table by index and jump
