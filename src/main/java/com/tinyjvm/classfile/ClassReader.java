@@ -35,17 +35,30 @@ public class ClassReader {
      * Read an unsigned 32-bit integer (big-endian)
      */
     public int readU4() {
-        return (data[position++] & 0xFF) << 24 | (data[position++] & 0xFF) << 16 | (data[position++] & 0xFF) << 8 | (data[position++] & 0xFF);
+        return (data[position++] & 0xFF) << 24 | (data[position++] & 0xFF) << 16 | (data[position++] & 0xFF) << 8
+                | (data[position++] & 0xFF);
     }
 
     /**
      * Read multiple bytes
      */
-    public byte[] readBytes(int length) { 
+    public byte[] readBytes(int length) {
         byte[] bytes = new byte[length];
         System.arraycopy(data, position, bytes, 0, length);
         position += length;
         return bytes;
+    }
+
+    /**
+     * Skips over n bytes in the input data.
+     * 
+     * @param n The number of bytes to skip.
+     */
+    public void skipBytes(int n) {
+        if (position + n > data.length) {
+            throw new IndexOutOfBoundsException("Attempt to skip beyond end of data");
+        }
+        position += n;
     }
 
     public int getPosition() {
