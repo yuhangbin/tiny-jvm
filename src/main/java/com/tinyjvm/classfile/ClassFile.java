@@ -105,8 +105,12 @@ public class ClassFile {
             this.methods[i] = new MethodInfo(reader, this.constantPool);
         }
 
-        // TODO: Parse class-level attributes in subsequent step
-        this.attributes = new AttributeInfo[0]; // Placeholder for class attributes
+        // 10. Parse ClassFile attributes
+        int classAttributesCount = reader.readU2();
+        this.attributes = new AttributeInfo[classAttributesCount];
+        for (int i = 0; i < classAttributesCount; i++) {
+            this.attributes[i] = AttributeInfo.readAttribute(reader, this.constantPool);
+        }
     }
 
     // Getters for accessing parsed data
@@ -212,6 +216,21 @@ public class ClassFile {
         for (MethodInfo method : methods) {
             if (method.getName().equals(name) && method.getDescriptor().equals(descriptor)) {
                 return method;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the SourceFile attribute of this class, if present.
+     * 
+     * @return The SourceFileAttribute, or null if this class has no SourceFile
+     *         attribute.
+     */
+    public AttributeInfo.SourceFileAttribute getSourceFileAttribute() {
+        for (AttributeInfo attr : attributes) {
+            if (attr instanceof AttributeInfo.SourceFileAttribute) {
+                return (AttributeInfo.SourceFileAttribute) attr;
             }
         }
         return null;

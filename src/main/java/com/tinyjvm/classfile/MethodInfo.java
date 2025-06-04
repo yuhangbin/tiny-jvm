@@ -1,5 +1,8 @@
 package com.tinyjvm.classfile;
 
+// Import AttributeInfo to access its nested CodeAttribute class
+import com.tinyjvm.classfile.AttributeInfo;
+
 /**
  * Represents a method in the class file.
  * method_info {
@@ -63,31 +66,26 @@ public class MethodInfo {
         return attributes;
     }
 
+    public ConstantPool getConstantPool() {
+        return constantPool;
+    }
+
     /**
      * Gets the Code attribute of this method, if present.
      * 
      * @return The CodeAttribute, or null if this method has no Code attribute
      *         (e.g., if it's an abstract or native method).
      */
-    public CodeAttribute getCodeAttribute() {
+    public AttributeInfo.CodeAttribute getCodeAttribute() {
         for (AttributeInfo attr : attributes) {
-            // The name of the attribute is resolved from the constant pool
-            // The AttributeInfo base class should provide a method to get its name.
-            if ("Code".equals(attr.getName())) { // Assumes attr.getName() resolves name_index via ConstantPool
-                if (attr instanceof CodeAttribute) {
-                    return (CodeAttribute) attr;
+            if ("Code".equals(attr.getName())) {
+                if (attr instanceof AttributeInfo.CodeAttribute) {
+                    return (AttributeInfo.CodeAttribute) attr;
                 } else {
-                    // This case should ideally not happen if readAttribute correctly instantiates
-                    // CodeAttribute.
-                    // However, if readAttribute returns a generic AttributeInfo for "Code", this is
-                    // a problem.
-                    // For now, we will assume readAttribute handles this correctly or throws an
-                    // error there.
-                    // Or, if CodeAttribute is a stub that doesn't extend our CodeAttribute type but
-                    // is named "Code".
                     System.err
-                            .println("Warning: Found attribute named 'Code' that is not an instance of CodeAttribute: "
-                                    + attr.getClass().getName());
+                            .println(
+                                    "Warning: Found attribute named 'Code' that is not an instance of AttributeInfo.CodeAttribute: "
+                                            + attr.getClass().getName());
                 }
             }
         }

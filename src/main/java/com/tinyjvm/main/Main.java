@@ -2,6 +2,12 @@ package com.tinyjvm.main;
 
 import com.tinyjvm.cmd.Cmd;
 import com.tinyjvm.classpath.Classpath;
+import com.tinyjvm.rtda.ClassLoader;
+import com.tinyjvm.rtda.MethodArea;
+import com.tinyjvm.rtda.RuntimeClass;
+import com.tinyjvm.rtda.Thread;
+import com.tinyjvm.classfile.MethodInfo;
+import com.tinyjvm.interpreter.Interpreter;
 
 /**
  * Main entry point for the Tiny JVM
@@ -17,14 +23,12 @@ public class Main {
             return; // Invalid arguments or help was shown
         }
 
-        // TODO: You will implement this method
-        // This should start the JVM with the parsed command line options
+        // Start the JVM with the parsed command line options
         startJVM(cmd);
     }
 
     /**
-     * TODO: Implement this method
-     * This is where you'll tie together all the JVM components:
+     * Starts the JVM by tying together all the components:
      * 1. Set up the classpath using cmd.getClasspath()
      * 2. Load the main class using cmd.getClassName()
      * 3. Find the main method
@@ -37,8 +41,42 @@ public class Main {
                 cmd.getClassName(),
                 java.util.Arrays.toString(cmd.getArgs()));
 
-        // TODO: Implement JVM startup logic here
-        // For now, just print what we would do
-        System.out.println("TODO: Start JVM with class: " + cmd.getClassName());
+        try {
+            // 1. Set up the classpath
+            Classpath classpath = new Classpath(cmd.getClasspath());
+
+            // 2. Set up method area and class loader
+            MethodArea methodArea = new MethodArea();
+            ClassLoader classLoader = new ClassLoader(classpath, methodArea);
+
+            // 3. Load the main class
+            String className = cmd.getClassName();
+            RuntimeClass mainClass = classLoader.loadClass(className);
+
+            // 4. Find the main method
+            MethodInfo mainMethod = mainClass.getMainMethod();
+            if (mainMethod == null) {
+                System.err.println("Error: Main method not found in class " + className);
+                return;
+            }
+
+            // 5. Create the initial thread
+            Thread thread = new Thread();
+
+            // 6. Set up the interpreter
+            Interpreter interpreter = new Interpreter(classLoader);
+
+            // 7. Start execution
+            System.out.println("Starting JVM execution...");
+            interpreter.interpret(thread, mainMethod, true); // verbose = true for debugging
+            System.out.println("JVM execution completed.");
+
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error: Could not find class " + cmd.getClassName());
+            System.err.println("ClassNotFoundException: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

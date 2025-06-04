@@ -36,29 +36,24 @@ public abstract class AttributeInfo {
      *                     structure.
      * @param constantPool Constant pool for resolving attribute names and for
      *                     nested attributes.
-     * @return An instance of a specific AttributeInfo subclass or
-     *         UnparsedAttribute.
+     * @return An instance of a specific AttributeInfo subclass or UnknownAttribute.
      */
     public static AttributeInfo readAttribute(ClassReader reader, ConstantPool constantPool) {
         int attributeNameIndex = reader.readU2();
         int attributeLength = reader.readU4();
         String attributeName = constantPool.getUtf8(attributeNameIndex);
 
-        // TODO: Implement specific attribute parsing based on attributeName
-        // Known attributes: "ConstantValue", "Code", "Exceptions", "SourceFile",
-        // "LineNumberTable", "LocalVariableTable", "Deprecated", "Synthetic", etc.
         switch (attributeName) {
+            case "SourceFile":
+                return new SourceFileAttribute(attributeNameIndex, attributeLength, reader, constantPool);
+            case "Code":
+                return new CodeAttribute(attributeNameIndex, attributeLength, reader, constantPool);
             // case "ConstantValue":
             // return new ConstantValueAttribute(attributeNameIndex, attributeLength,
             // reader, constantPool);
-            // case "Code":
-            // // CodeAttribute constructor needs different signature or handling here
-            // // return new CodeAttribute(attributeNameIndex, attributeLength, reader,
-            // constantPool);
             // break;
             // Add other known attributes here
             default:
-                // For unknown or unhandled attributes, read and skip their data.
                 reader.skipBytes(attributeLength);
                 return new UnknownAttribute(attributeNameIndex, attributeLength, constantPool);
         }
@@ -69,96 +64,142 @@ public abstract class AttributeInfo {
      * Its content is skipped.
      */
     static class UnknownAttribute extends AttributeInfo {
-        private byte[] data; // Optionally store the raw data if needed for debugging
-
         UnknownAttribute(int nameIndex, int length, ConstantPool cp) {
             super(nameIndex, length, cp);
-            // The ClassReader already skipped the bytes in readAttribute's default case
-            // If we wanted to store them, we would read them here BEFORE readAttribute
-            // skips.
-            // For now, data is not stored to save memory, assuming skipping is sufficient.
+            // Data is skipped by the factory method for unknown attributes.
         }
     }
-}
-
-/**
- * Represents the Code attribute containing method bytecode
- */
-class CodeAttribute extends AttributeInfo {
-
-    private int maxStack;
-    private int maxLocals;
-    private byte[] code;
-    private ExceptionTableEntry[] exceptionTable;
-    private AttributeInfo[] attributes;
 
     /**
-     * TODO: Implement this constructor
-     * Parse Code attribute from class data
+     * Represents the "SourceFile" attribute.
+     * SourceFile_attribute {
+     * u2 attribute_name_index;
+     * u4 attribute_length; // Must be 2
+     * u2 sourcefile_index; // Index to CONSTANT_Utf8_info
+     * }
      */
-    public CodeAttribute(int nameIndex, int length, ClassReader reader, ConstantPool cp) {
-        super(nameIndex, length, cp);
-        // TODO: Read max_stack, max_locals
-        // TODO: Read code_length and code bytes
-        // TODO: Read exception table
-        // TODO: Read attributes within Code attribute
-        // For now, skip the body of the code attribute to allow ClassFile parsing to
-        // proceed
-        reader.skipBytes(length); // This is a temporary measure to consume the attribute's declared length
-        // throw new RuntimeException("TODO: Implement CodeAttribute constructor");
-    }
+    public static class SourceFileAttribute extends AttributeInfo {
+        private int sourceFileIndex;
 
-    public int getMaxStack() {
-        return maxStack;
-    }
+        public SourceFileAttribute(int nameIndex, int length, ClassReader reader, ConstantPool cp) {
+            super(nameIndex, length, cp);
+            if (length != 2) {
+                throw new ClassFormatError("SourceFile attribute length must be 2, but was " + length);
+            }
+            this.sourceFileIndex = reader.readU2();
+        }
 
-    public int getMaxLocals() {
-        return maxLocals;
-    }
+        public int getSourceFileIndex() {
+            return sourceFileIndex;
+        }
 
-    public byte[] getCode() {
-        return code;
+        public String getSourceFileName() {
+            return constantPool.getUtf8(sourceFileIndex);
+        }
     }
-
-    public ExceptionTableEntry[] getExceptionTable() {
-        return exceptionTable;
-    }
-
-    public AttributeInfo[] getAttributes() {
-        return attributes;
-    }
-}
-
-/**
- * Represents an exception table entry in the Code attribute
- */
-class ExceptionTableEntry {
-    private int startPc;
-    private int endPc;
-    private int handlerPc;
-    private int catchType;
 
     /**
-     * TODO: Implement this constructor
+     * Represents the Code attribute containing method bytecode
      */
-    public ExceptionTableEntry(ClassReader reader) {
-        // TODO: Read start_pc, end_pc, handler_pc, catch_type
-        throw new RuntimeException("TODO: Implement ExceptionTableEntry constructor");
-    }
+    public static class CodeAttribute extends AttributeInfo {
 
-    public int getStartPc() {
-        return startPc;
-    }
+        private int maxStack;
+        private int maxLocals;
+        private byte[] code;
+        private ExceptionTableEntry[] exceptionTable;
+        private AttributeInfo[] attributes; // Attributes of the Code attribute itself
 
-    public int getEndPc() {
-        return endPc;
-    }
+        /**
+         * Parses the Code attribute from the ClassReader.
+         * The attribute_length is the length of the entire attribute, excluding the
+         * initial 6 bytes
+         * (attribute_name_index and attribute_length itself).
+         */
+        public CodeAttribute(int nameIndex, int length, ClassReader reader, ConstantPool cp) {
+            super(nameIndex, length, cp); // length is the total length of the attribute data
 
-    public int getHandlerPc() {
-        return handlerPc;
-    }
+            this.maxStack = reader.readU2();
+            this.maxLocals = reader.readU2();
 
-    public int getCatchType() {
-        return catchType;
+            int codeLength = reader.readU4();
+            this.code = reader.readBytes(codeLength);
+
+            int exceptionTableLength = reader.readU2();
+            this.exceptionTable = new ExceptionTableEntry[exceptionTableLength];
+            for (int i = 0; i < exceptionTableLength; i++) {
+                this.exceptionTable[i] = new ExceptionTableEntry(reader);
+            }
+
+            int attributesCount = reader.readU2();
+            this.attributes = new AttributeInfo[attributesCount];
+            for (int i = 0; i < attributesCount; i++) {
+                this.attributes[i] = AttributeInfo.readAttribute(reader, cp); // Recursive call for nested attributes
+            }
+        }
+
+        public int getMaxStack() {
+            return maxStack;
+        }
+
+        public int getMaxLocals() {
+            return maxLocals;
+        }
+
+        public byte[] getCode() {
+            return code;
+        }
+
+        public ExceptionTableEntry[] getExceptionTable() {
+            return exceptionTable;
+        }
+
+        public AttributeInfo[] getAttributes() {
+            return attributes;
+        }
+
+        /**
+         * Represents an exception table entry in the Code attribute
+         * exception_table {
+         * u2 start_pc;
+         * u2 end_pc;
+         * u2 handler_pc;
+         * u2 catch_type; // Index into constant pool (CONSTANT_Class_info) or 0 for
+         * finally
+         * }
+         */
+        public static class ExceptionTableEntry {
+            private int startPc;
+            private int endPc;
+            private int handlerPc;
+            private int catchType; // If non-zero, an index into the constant pool to a CONSTANT_Class_info
+
+            /**
+             * Parses an exception_table_entry from the ClassReader.
+             * 
+             * @param reader ClassReader positioned at the start of the entry.
+             */
+            public ExceptionTableEntry(ClassReader reader) {
+                this.startPc = reader.readU2();
+                this.endPc = reader.readU2();
+                this.handlerPc = reader.readU2();
+                this.catchType = reader.readU2();
+            }
+
+            public int getStartPc() {
+                return startPc;
+            }
+
+            public int getEndPc() {
+                return endPc;
+            }
+
+            public int getHandlerPc() {
+                return handlerPc;
+            }
+
+            public int getCatchType() {
+                return catchType;
+            }
+        }
     }
 }

@@ -26,11 +26,31 @@ public abstract class ConstantInfo {
     public static final int CONSTANT_Methodref = 10;
     public static final int CONSTANT_InterfaceMethodref = 11;
     public static final int CONSTANT_NameAndType = 12;
+    // Tags added for Java 7+
+    public static final int CONSTANT_MethodHandle = 15;
+    public static final int CONSTANT_MethodType = 16;
+    public static final int CONSTANT_InvokeDynamic = 18;
+    // Java 9+
+    public static final int CONSTANT_Dynamic = 17;
+    public static final int CONSTANT_Module = 19;
+    public static final int CONSTANT_Package = 20;
 
     protected int tag;
+    protected ConstantPool constantPool; // For resolving names within specific constants if needed
 
     public ConstantInfo(int tag) {
         this.tag = tag;
+    }
+
+    // Setter for ConstantPool, to be called after ConstantPool itself is
+    // initialized
+    // This is needed if a ConstantInfo wants to resolve other constants during its
+    // own parsing
+    // which is not typical but possible for very complex constants or validation.
+    // For now, most ConstantXyz constructors don't need it, but good to have the
+    // link.
+    void setConstantPool(ConstantPool cp) {
+        this.constantPool = cp;
     }
 
     public int getTag() {
@@ -48,32 +68,57 @@ public abstract class ConstantInfo {
      */
     public static ConstantInfo readConstant(ClassReader reader) {
         int tag = reader.readU1();
+        ConstantInfo constInfo;
         switch (tag) {
             case CONSTANT_Utf8:
-                return new ConstantUtf8(reader);
+                constInfo = new ConstantUtf8(reader);
+                break;
             case CONSTANT_Class:
-                return new ConstantClass(reader);
+                constInfo = new ConstantClass(reader);
+                break;
             case CONSTANT_String:
-                return new ConstantString(reader);
+                constInfo = new ConstantString(reader);
+                break;
             case CONSTANT_Fieldref:
-                return new ConstantFieldref(reader);
+                constInfo = new ConstantFieldref(reader);
+                break;
             case CONSTANT_Methodref:
-                return new ConstantMethodref(reader);
+                constInfo = new ConstantMethodref(reader);
+                break;
             case CONSTANT_InterfaceMethodref:
-                return new ConstantInterfaceMethodref(reader);
+                constInfo = new ConstantInterfaceMethodref(reader);
+                break;
             case CONSTANT_NameAndType:
-                return new ConstantNameAndType(reader);
+                constInfo = new ConstantNameAndType(reader);
+                break;
             case CONSTANT_Integer:
-                return new ConstantInteger(reader);
+                constInfo = new ConstantInteger(reader);
+                break;
             case CONSTANT_Float:
-                return new ConstantFloat(reader);
+                constInfo = new ConstantFloat(reader);
+                break;
             case CONSTANT_Long:
-                return new ConstantLong(reader);
+                constInfo = new ConstantLong(reader);
+                break;
             case CONSTANT_Double:
-                return new ConstantDouble(reader);
+                constInfo = new ConstantDouble(reader);
+                break;
+            case CONSTANT_MethodHandle:
+                constInfo = new ConstantMethodHandle(reader);
+                break;
+            case CONSTANT_MethodType:
+                constInfo = new ConstantMethodType(reader);
+                break;
+            case CONSTANT_Dynamic:
+                constInfo = new ConstantDynamic(reader);
+                break;
+            case CONSTANT_InvokeDynamic:
+                constInfo = new ConstantInvokeDynamic(reader);
+                break;
             default:
                 throw new ClassFormatError("Invalid constant pool tag: " + tag);
         }
+        return constInfo;
     }
 
     // --- Inner classes for specific constant types ---
@@ -97,7 +142,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantUtf8 extends ConstantInfo {
+    public static class ConstantUtf8 extends ConstantInfo {
         private String value;
 
         ConstantUtf8(ClassReader reader) {
@@ -132,7 +177,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantClass extends ConstantInfo {
+    public static class ConstantClass extends ConstantInfo {
         private int nameIndex;
 
         ConstantClass(ClassReader reader) {
@@ -163,7 +208,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantString extends ConstantInfo {
+    public static class ConstantString extends ConstantInfo {
         private int stringIndex;
 
         ConstantString(ClassReader reader) {
@@ -196,7 +241,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantFieldref extends ConstantInfo {
+    public static class ConstantFieldref extends ConstantInfo {
         private int classIndex;
         private int nameAndTypeIndex;
 
@@ -205,7 +250,14 @@ public abstract class ConstantInfo {
             this.classIndex = reader.readU2();
             this.nameAndTypeIndex = reader.readU2();
         }
-        // Getters can be added if needed: getClassIndex(), getNameAndTypeIndex()
+
+        public int getClassIndex() {
+            return classIndex;
+        }
+
+        public int getNameAndTypeIndex() {
+            return nameAndTypeIndex;
+        }
     }
 
     /**
@@ -229,7 +281,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantMethodref extends ConstantInfo {
+    public static class ConstantMethodref extends ConstantInfo {
         private int classIndex;
         private int nameAndTypeIndex;
 
@@ -238,7 +290,14 @@ public abstract class ConstantInfo {
             this.classIndex = reader.readU2();
             this.nameAndTypeIndex = reader.readU2();
         }
-        // Getters can be added if needed
+
+        public int getClassIndex() {
+            return classIndex;
+        }
+
+        public int getNameAndTypeIndex() {
+            return nameAndTypeIndex;
+        }
     }
 
     /**
@@ -263,7 +322,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantInterfaceMethodref extends ConstantInfo {
+    public static class ConstantInterfaceMethodref extends ConstantInfo {
         private int classIndex;
         private int nameAndTypeIndex;
 
@@ -272,7 +331,14 @@ public abstract class ConstantInfo {
             this.classIndex = reader.readU2();
             this.nameAndTypeIndex = reader.readU2();
         }
-        // Getters can be added if needed
+
+        public int getClassIndex() {
+            return classIndex;
+        }
+
+        public int getNameAndTypeIndex() {
+            return nameAndTypeIndex;
+        }
     }
 
     /**
@@ -294,7 +360,7 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantNameAndType extends ConstantInfo {
+    public static class ConstantNameAndType extends ConstantInfo {
         private int nameIndex;
         private int descriptorIndex;
 
@@ -328,14 +394,17 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantInteger extends ConstantInfo {
+    public static class ConstantInteger extends ConstantInfo {
         private int value;
 
         ConstantInteger(ClassReader reader) {
             super(CONSTANT_Integer);
             this.value = reader.readU4();
         }
-        // Getter: public int getValue() { return value; }
+
+        public int getValue() {
+            return value;
+        }
     }
 
     /**
@@ -353,14 +422,17 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantFloat extends ConstantInfo {
+    public static class ConstantFloat extends ConstantInfo {
         private float value;
 
         ConstantFloat(ClassReader reader) {
             super(CONSTANT_Float);
-            this.value = Float.intBitsToFloat(reader.readU4()); // Corrected: Use Float.intBitsToFloat
+            this.value = Float.intBitsToFloat(reader.readU4());
         }
-        // Getter: public float getValue() { return value; }
+
+        public float getValue() {
+            return value;
+        }
     }
 
     /**
@@ -381,17 +453,19 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantLong extends ConstantInfo {
+    public static class ConstantLong extends ConstantInfo {
         private long value;
 
         ConstantLong(ClassReader reader) {
             super(CONSTANT_Long);
             long highBytes = reader.readU4();
             long lowBytes = reader.readU4();
-            this.value = (highBytes << 32) + (lowBytes & 0xFFFFFFFFL); // Ensure lowBytes is treated as unsigned for the
-                                                                       // combine
+            this.value = (highBytes << 32) + (lowBytes & 0xFFFFFFFFL);
         }
-        // Getter: public long getValue() { return value; }
+
+        public long getValue() {
+            return value;
+        }
     }
 
     /**
@@ -412,16 +486,93 @@ public abstract class ConstantInfo {
      * }
      * </pre>
      */
-    static class ConstantDouble extends ConstantInfo {
+    public static class ConstantDouble extends ConstantInfo {
         private double value;
 
         ConstantDouble(ClassReader reader) {
             super(CONSTANT_Double);
             long highBytes = reader.readU4();
             long lowBytes = reader.readU4();
-            long bits = (highBytes << 32) + (lowBytes & 0xFFFFFFFFL); // Ensure lowBytes is treated as unsigned
+            long bits = (highBytes << 32) + (lowBytes & 0xFFFFFFFFL);
             this.value = Double.longBitsToDouble(bits);
         }
-        // Getter: public double getValue() { return value; }
+
+        public double getValue() {
+            return value;
+        }
+    }
+
+    /** CONSTANT_MethodHandle_info (tag 15) */
+    public static class ConstantMethodHandle extends ConstantInfo {
+        private int referenceKind; // u1
+        private int referenceIndex; // u2
+
+        ConstantMethodHandle(ClassReader reader) {
+            super(CONSTANT_MethodHandle);
+            this.referenceKind = reader.readU1();
+            this.referenceIndex = reader.readU2();
+        }
+
+        public int getReferenceKind() {
+            return referenceKind;
+        }
+
+        public int getReferenceIndex() {
+            return referenceIndex;
+        }
+    }
+
+    /** CONSTANT_MethodType_info (tag 16) */
+    public static class ConstantMethodType extends ConstantInfo {
+        private int descriptorIndex; // u2, index to CONSTANT_Utf8 for method descriptor
+
+        ConstantMethodType(ClassReader reader) {
+            super(CONSTANT_MethodType);
+            this.descriptorIndex = reader.readU2();
+        }
+
+        public int getDescriptorIndex() {
+            return descriptorIndex;
+        }
+    }
+
+    /** CONSTANT_Dynamic_info (tag 17) */
+    public static class ConstantDynamic extends ConstantInfo {
+        private int bootstrapMethodAttrIndex; // u2
+        private int nameAndTypeIndex; // u2, index to CONSTANT_NameAndType
+
+        ConstantDynamic(ClassReader reader) {
+            super(CONSTANT_Dynamic);
+            this.bootstrapMethodAttrIndex = reader.readU2();
+            this.nameAndTypeIndex = reader.readU2();
+        }
+
+        public int getBootstrapMethodAttrIndex() {
+            return bootstrapMethodAttrIndex;
+        }
+
+        public int getNameAndTypeIndex() {
+            return nameAndTypeIndex;
+        }
+    }
+
+    /** CONSTANT_InvokeDynamic_info (tag 18) */
+    public static class ConstantInvokeDynamic extends ConstantInfo {
+        private int bootstrapMethodAttrIndex; // u2
+        private int nameAndTypeIndex; // u2, index to CONSTANT_NameAndType
+
+        ConstantInvokeDynamic(ClassReader reader) {
+            super(CONSTANT_InvokeDynamic);
+            this.bootstrapMethodAttrIndex = reader.readU2();
+            this.nameAndTypeIndex = reader.readU2();
+        }
+
+        public int getBootstrapMethodAttrIndex() {
+            return bootstrapMethodAttrIndex;
+        }
+
+        public int getNameAndTypeIndex() {
+            return nameAndTypeIndex;
+        }
     }
 }
